@@ -2,29 +2,29 @@ const express = require("express");
 const app = express();
 const server = require("http").Server(app);
 const io = require("socket.io")(server);
-const port = 7379;
+const port = process.env.WEBRTC_PORT;
 
 const users = [];
 const players = [];
 
-io.on('connection', function (socket) {
+io.on("connection", function (socket) {
   console.log("Player Connected!");
-  socket.emit('socketID', { id: socket.id });
-  socket.emit('getPlayers', players);
-  socket.broadcast.emit('newPlayer', { id: socket.id });
+  socket.emit("socketID", { id: socket.id });
+  socket.emit("getPlayers", players);
+  socket.broadcast.emit("newPlayer", { id: socket.id });
   socket.on("playerMoved", function (data) {
-    data.id = socket.id
-    socket.broadcast.emit("playerMoved", data)
+    data.id = socket.id;
+    socket.broadcast.emit("playerMoved", data);
     for (let i = 0; i < players.length; i++) {
       if (players[i].id == data.id) {
-        players[i].x = data.x
-        players[i].y = data.y
+        players[i].x = data.x;
+        players[i].y = data.y;
       }
     }
-  })
-  socket.on('disconnect', function () {
+  });
+  socket.on("disconnect", function () {
     console.log("Player Disconnected");
-    socket.broadcast.emit('playerDisconnected', { id: socket.id });
+    socket.broadcast.emit("playerDisconnected", { id: socket.id });
     for (let i = 0; i < players.length; i++) {
       if (players[i].id == socket.id) {
         players.splice(i, 1);
@@ -71,8 +71,8 @@ class User {
 class player {
   constructor(id, x, y) {
     this.id = id;
-    this.x = x
-    this.y = y
+    this.x = x;
+    this.y = y;
   }
 }
 

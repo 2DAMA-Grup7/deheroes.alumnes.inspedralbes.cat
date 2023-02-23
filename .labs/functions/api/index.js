@@ -3,11 +3,11 @@ const cors = require("cors");
 const cookieSession = require("cookie-session");
 
 const dbConfig = require("./config/db.config");
-require('dotenv').config()
+require("dotenv").config();
 const app = express();
 
 var corsOptions = {
-  origin: "http://deheroes-test.alumnes.inspedralbes.cat:7378"
+  origin: "http://deheroes-test.alumnes.inspedralbes.cat:7378",
 };
 
 app.use(cors(corsOptions));
@@ -22,7 +22,7 @@ app.use(
   cookieSession({
     name: "session1",
     secret: process.env.COOKIE_SECRET,
-    httpOnly: true
+    httpOnly: true,
   })
 );
 
@@ -54,7 +54,7 @@ require("./routes/auth.routes")(app);
 require("./routes/user.routes")(app);
 
 // set port, listen for requests
-const PORT = process.env.PORT || 7378;
+const PORT = process.env.API_PORT;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
@@ -63,8 +63,8 @@ function initial() {
   Role.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
       new Role({
-        name: "user"
-      }).save(err => {
+        name: "user",
+      }).save((err) => {
         if (err) {
           console.log("error", err);
         }
@@ -73,8 +73,8 @@ function initial() {
       });
 
       new Role({
-        name: "admin"
-      }).save(err => {
+        name: "admin",
+      }).save((err) => {
         if (err) {
           console.log("error", err);
         }
