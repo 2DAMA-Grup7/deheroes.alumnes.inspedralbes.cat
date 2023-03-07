@@ -7,32 +7,62 @@ const port = process.env.WEBRTC_PORT;
 const users = [];
 const players = [];
 
-io.on("connection", function (socket) {
-  console.log("Player Connected!");
-  socket.emit("socketID", { id: socket.id });
-  socket.emit("getPlayers", players);
-  socket.broadcast.emit("newPlayer", { id: socket.id });
-  socket.on("playerMoved", function (data) {
-    data.id = socket.id;
-    socket.broadcast.emit("playerMoved", data);
-    for (let i = 0; i < players.length; i++) {
-      if (players[i].id == data.id) {
-        players[i].x = data.x;
-        players[i].y = data.y;
-      }
-    }
-  });
-  socket.on("disconnect", function () {
-    console.log("Player Disconnected");
-    socket.broadcast.emit("playerDisconnected", { id: socket.id });
-    for (let i = 0; i < players.length; i++) {
-      if (players[i].id == socket.id) {
-        players.splice(i, 1);
-      }
-    }
-  });
-  players.push(new player(socket.id, 0, 0));
+
+server.listen(port, () => {
+  console.log(`Server running at ${port}`);
 });
+
+
+io.on('connection', function(socket){
+  socket.on('connection' , (data) => {
+    if(players.length==0){
+      console.log("Host Connected!");
+      console.log(data.id);
+      players[0] = data.id;
+    }
+    else{
+      res = {id : players.length};
+      console.log("P2 Connected")
+      socket.broadcast.emit("getP2" , res);
+    }
+  })
+
+  socket.on('movement', (data) => {
+    console.log(data)
+    for(i = 0; i <= players.length; i++){
+      if(data.id==players[i]){
+      socket.emit('playerMoved', data);}
+    }
+  })
+
+  /*
+
+  TODO: Retocar els disconects:  
+  He fet un petit disconnect mes endevant, esta super mal fet ho hem de retocar
+  
+  
+  socket.on('disconnectPlayer', (data) => {
+    console.log("Player disconnected");
+    for(i = 0; i <= players.length; i++){
+      if(data.id==players[i]){
+        players.splice(data.id , 1);
+        if(players.length){
+        for(i=0;i<=players.length; i++){
+          Console.log("Current players"+players.length)
+        }}
+      }
+    }
+  })*/
+
+  socket.on('disconnect' , function(socket) {
+      console.log("Deleting playerInfo")
+      players.splice(0,players.length);
+  })
+
+
+});
+
+
 
 /*io.on("connection", (socket) => {
   socket.on("disconnect", () => {
@@ -67,15 +97,3 @@ class User {
     this.y=300 
   }
 } */
-
-class player {
-  constructor(id, x, y) {
-    this.id = id;
-    this.x = x;
-    this.y = y;
-  }
-}
-
-server.listen(port, () => {
-  console.log(`Server running at ${port}`);
-});
